@@ -1,0 +1,17 @@
+{
+    "feeds": [
+        {
+            "provider": "rss",
+            "url": "https://sergiandreplace.com/index.xml"
+        },
+        {
+            "provider": "gmail",
+            "alias": "me@gmail.com",
+            "label": "^smartlabel_personal"
+        },
+        {
+            "provider": "gmail",
+            "alias": "other@gmail.com"
+        }
+    ]
+}

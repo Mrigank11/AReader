@@ -1,0 +1,5 @@
+requests==2.18.4
+notify2==0.3.1
+google_auth_oauthlib==0.2.0
+feedparser==5.2.1
+protobuf==3.5.2.post1
