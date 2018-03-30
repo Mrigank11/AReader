@@ -35,6 +35,8 @@ def main():
         for feed in FEEDS:
             try:
                 notif = feed.get_notification()
+                feed = feed.get_config()
+                CONFIG.write()
                 if notif:
                     n = notify2.Notification(*notif)
                     n.show()

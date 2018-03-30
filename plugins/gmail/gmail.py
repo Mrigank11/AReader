@@ -46,7 +46,7 @@ class GmailFeed():
         req = feedparser.parse(self.session.get(
             "https://mail.google.com/mail/feed/atom/" + label).text)
         num = len(req['entries'])
-        update = req['feed']['updated_parsed']
+        update = req['feed']['updated']
         if 'last_update' in self.feed and self.feed['last_update'] == update:
             return
         self.feed['last_update'] = update
