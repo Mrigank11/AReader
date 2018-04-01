@@ -11,9 +11,6 @@ class RSS_Feed():
     def fix_time(self, t):
         return time.strftime("%Y-%m-%dT%H:%M:%S", t)
 
-    def get_config(self):
-        return self.feed
-
     def get_notification(self):
         req = feedparser.parse(self.feed["url"])
         title = req["feed"]["title"]

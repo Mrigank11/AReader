@@ -9,7 +9,7 @@ class Config:
         # create empty CONFIG_FILE
         if(not os.path.exists(self.CONFIG_FILE)):
             with open(self.CONFIG_FILE, "a") as f:
-                f.write("{}")
+                f.write("{\"feeds\":[]}")
         self.read()
 
     def read(self):

@@ -2,6 +2,7 @@ import feedparser
 from google.auth.transport.requests import AuthorizedSession
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
+import time
 
 
 class GmailFeed():
@@ -16,11 +17,16 @@ class GmailFeed():
                 'plugins/gmail/client_secret.json',
                 scopes=['https://mail.google.com/mail/feed/atom'])
             self.flow.run_local_server(
-                port=8888, open_browser=True, access_type='offline', include_granted_scopes='true')
+                port=8888, open_browser=True, access_type='offline', include_granted_scopes='true', prompt='consent')
             self.save_creds()
+            # hack to prevent server from crashing due to chrome requesting /favicon.ico
+            time.sleep(5)
         else:
-            creds = Credentials(** self.feed["creds"])
-            self.session = AuthorizedSession(creds)
+            self.get_session()
+
+    def get_session(self):
+        creds = Credentials(** self.feed["creds"])
+        self.session = AuthorizedSession(creds)
 
     def save_creds(self):
         credentials = self.flow.credentials
@@ -31,9 +37,7 @@ class GmailFeed():
                  'client_secret': credentials.client_secret,
                  'scopes': credentials.scopes}
         self.feed['creds'] = creds
-        return self.feed
-
-    def get_config(self):
+        self.get_session()
         return self.feed
 
     def get_notification(self):
