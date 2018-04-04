@@ -3,6 +3,8 @@ from google.auth.transport.requests import AuthorizedSession
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 import time
+import webbrowser
+import re
 
 
 class GmailFeed():
@@ -40,6 +42,16 @@ class GmailFeed():
         self.get_session()
         return self.feed
 
+    def handle_notification_callback(self, n, action, data):
+        print("Opening in gmail")
+        link = data or "https://mail.google.com/mail"
+        # change user index
+        if 'u' in self.feed:
+            link = re.sub(r"google.com/mail(/u/.)?",
+                          "google.com/mail/u/" + self.feed['u'], link)
+        # open browser
+        webbrowser.open(link)
+
     def get_notification(self):
         title = "Gmail"
         label = ""
@@ -60,6 +72,8 @@ class GmailFeed():
             entry = req['entries'][0]
             msg = entry['title']
             title = entry['author_detail']['name']
+            data = entry['link']
         else:
             msg = "{} new messages".format(num)
-        return (title, msg, "gmail")
+            data = None
+        return (title, msg, "gmail", data, self.handle_notification_callback)

@@ -1,26 +1,28 @@
-import os
 from config import Config
 import time
-import notify2
 import logging
+from threading import Thread
 from plugins.gmail.gmail import GmailFeed
 from plugins.rss.rss import RSS_Feed
+from notifier import Notifier
 
-from threading import Thread
 
 logger = logging.getLogger("AReader")  # init logger
 
+# globals
+CONFIG = Config()
+PROVIDERS = {
+    "gmail": GmailFeed,
+    "rss": RSS_Feed
+}
+SLEEP_TIME = 20
+NOTIFICATION_TIMEOUT = 5000
+NOTIFIER = Notifier(NOTIFICATION_TIMEOUT)
+
 
 def main():
-    # globals
-    CONFIG = Config()
-    PROVIDERS = {
-        "gmail": GmailFeed,
-        "rss": RSS_Feed
-    }
     FEEDS = []
     THREADS = []
-    SLEEP_TIME = 10
     # load providers
     for feed in CONFIG.get("feeds"):
         provider_name = feed['provider']
@@ -28,6 +30,7 @@ def main():
             logger.error("PROVIDER NOT FOUND: " + provider_name)
             return
         provider = PROVIDERS[provider_name](feed)
+        provider.last_checked = None
         # feed obj might have changed, update config
         CONFIG.write()
         FEEDS.append(provider)
@@ -35,21 +38,21 @@ def main():
     def handle_feed(feed):
         try:
             notif = feed.get_notification()
+            feed.last_checked = time.strftime("%H:%M:%S", time.localtime())
             # feed obj might have changed, update config
             CONFIG.write()
             if notif:
-                n = notify2.Notification(*notif)
-                n.show()
+                NOTIFIER.notify(*notif)
         except Exception as e:
             print("error on {}: {}".format(feed, e))
 
-    # init notification
-    notify2.init("AReader")
     while True:
         for th in THREADS:
             th.join()
         THREADS = []
+        print("\r", end="")
         for feed in FEEDS:
+            print(feed.feed['provider'], feed.last_checked, end=" ")
             t = Thread(target=handle_feed, args=(feed,))
             t.start()
             THREADS.append(t)
@@ -61,3 +64,5 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         print("\nGood Bye!")
+        NOTIFIER.close()
+        exit(0)

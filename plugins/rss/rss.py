@@ -1,5 +1,7 @@
 import feedparser
 import time
+import webbrowser
+import re
 
 
 class RSS_Feed():
@@ -10,6 +12,22 @@ class RSS_Feed():
 
     def fix_time(self, t):
         return time.strftime("%Y-%m-%dT%H:%M:%S", t)
+
+    def handle_notification_callback(self, n, action, data=None):
+        if data:
+            webbrowser.open(data)
+            return
+
+        if "homepage" in self.feed:
+            webbrowser.open(self.feed["homepage"])
+        else:
+            # try to guess homepage
+            try:
+                homepage = re.match(r"(http.?://.*?/)",
+                                    self.feed["url"]).group(1)
+                webbrowser.open(homepage)
+            except Exception:
+                print("unable to get homepage")
 
     def get_notification(self):
         req = feedparser.parse(self.feed["url"])
@@ -29,6 +47,8 @@ class RSS_Feed():
         if num == 1:
             entry = req['entries'][0]
             msg = entry['title']
+            data = entry['link']
         else:
             msg = "{} new entries".format(num)
-        return (title, msg)
+            data = None
+        return (title, msg, "", data, self.handle_notification_callback)

@@ -15,7 +15,8 @@ Add an object to areader.json:
 {
     "provider":"rss",
     "url":"<url to atom/rss feed>",
-    "title":"<notification title>(Optional)"
+    "title":"<notification title>(Optional)",
+    "homepage":"<url to open on notification click>(Optional)"
 }
 ```
 ### Add Gmail Source:
@@ -27,7 +28,8 @@ Add an object to areader.json:
 {
     "provider":"gmail",
     "alias":"<identifier of gmail id>(Optional)",
-    "label":"<label to fetch>(Optional)"
+    "label":"<label to fetch>(Optional)",
+    "u":"<if you're using >1 google acc. in browser, then index of the corresponding google acc.(Optional)"
 }
 ```
-- At first run, your browser will open for authorizing each entry having `gmail` as `provider` in the order of appearance in `areader.json`
+- **Note**: At first run, your browser will open for authorizing each entry having `gmail` as `provider` in the order of appearance in `areader.json`
